@@ -19,7 +19,7 @@ set -euo pipefail
 # 1. Parameters / defaults
 SEARCH_DIR="${1:-html/wp-content/uploads/}"
 # Set how many top images ratio to display in the report
-TOP_N_COUNT="${2:-30}
+TOP_N_COUNT="${2:-30}"
 
 # Converts bytes to a human-readable format (KB, MB, GB)
 human_readable() {
@@ -171,7 +171,6 @@ echo # Move to a new line for better formatting.
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo
     echo "User confirmed. Proceeding with deletion..."
-    deleted_count=0
     
     # Iterate through the performance data array which contains all the necessary file info.
     # This is more efficient than running 'find' again.
@@ -183,14 +182,13 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         # Double-check that the file exists before attempting to delete it.
         if [ -f "$file_to_delete" ]; then
             rm -v "$file_to_delete"
-            ((deleted_count++))
         else
             echo "Warning: File not found, skipping: $file_to_delete"
         fi
     done
 
     echo "----------------------------------------------------------------"
-    echo "Deletion complete. $deleted_count files were removed."
+    echo "Deletion complete."
 
 else
     echo
