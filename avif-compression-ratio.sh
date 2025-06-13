@@ -17,9 +17,9 @@
 set -euo pipefail
 
 # 1. Parameters / defaults
-SEARCH_DIR="html/wp-content/uploads/"
+SEARCH_DIR="${1:-html/wp-content/uploads/}"
 # Set how many top images ratio to display in the report
-TOP_N_COUNT=30
+TOP_N_COUNT="${2:-30}
 
 # Converts bytes to a human-readable format (KB, MB, GB)
 human_readable() {
@@ -50,14 +50,14 @@ fi
 echo "Analyzing AVIF optimization in '$SEARCH_DIR'..."
 echo "----------------------------------------------------------------"
 
-# 2. Initialize variables
+# 3. Initialize variables
 total_old_size=0
 total_new_size=0
 pair_count=0
 # Declare an array to hold performance data for each file pair
 declare -a performance_data
 
-# 3. Find all original images and process only those with an AVIF pair
+# 4. Find all original images and process only those with an AVIF pair
 while IFS= read -r image_file; do
     base_name="${image_file%.*}"
     avif_file="${base_name}.avif"
@@ -78,20 +78,20 @@ while IFS= read -r image_file; do
     fi
 done < <(find "$SEARCH_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.gif" -o -iname "*.webp" \))
 
-# 4. Check if any pairs were found
+# 5. Check if any pairs were found
 if (( pair_count == 0 )); then
     echo "No matching image/.avif pairs were found in the directory."
     exit 0
 fi
 
-# 5. Calculate Overall Statistics
+# 6. Calculate Overall Statistics
 overall_savings_bytes=$((total_old_size - total_new_size))
 overall_optimization_rate=0
 if (( total_old_size > 0 )); then
     overall_optimization_rate=$(echo "scale=2; ($overall_savings_bytes * 100) / $total_old_size" | bc)
 fi
 
-# 6. Calculate Percentile Statistics
+# 7. Calculate Percentile Statistics
 # Create a sorted list of just the ratios by extracting the first column
 sorted_ratios=($(printf '%s\n' "${performance_data[@]}" | sort -rn | awk '{print $1}'))
 
@@ -110,7 +110,7 @@ percent_1=$(printf "%.2f" $(echo "scale=2; $ratio_1 * 100" | bc))
 percent_10=$(printf "%.2f" $(echo "scale=2; $ratio_10 * 100" | bc))
 percent_50=$(printf "%.2f" $(echo "scale=2; $ratio_50 * 100" | bc))
 
-# 7. Print the reports
+# 8. Print the reports
 echo "Analysis based on $pair_count image pairs found."
 echo
 echo "--- Overall Size Comparison ---"
@@ -128,7 +128,7 @@ printf " 1%% Low (Top 1%%):  The best  1%% of files were optimized by at least %
 echo "----------------------------------------------------------------"
 echo
 
-# 8. Find and display the Top N most compressed images (configurable)
+# 9. Find and display the Top N most compressed images (configurable)
 echo "--- Top ${TOP_N_COUNT} Images by Compression Ratio ---"
 printf "%-12s | %-12s | %-12s | %s\n" "Reduction" "Original Sz" "AVIF Sz" "File"
 printf "%-12s | %-12s | %-12s | %s\n" "------------" "------------" "------------" "----"
@@ -153,10 +153,7 @@ done < <(printf '%s\n' "${performance_data[@]}" | sort -rn | head -n "${TOP_N_CO
 echo "----------------------------------------------------------------"
 
 
-# -----------------------------------------------------------------------------
-# 9. Request confirmation and delete original images with AVIF counterparts
-# -----------------------------------------------------------------------------
-
+# 10. Request confirmation and delete original images with AVIF counterparts
 echo
 echo "The analysis found $pair_count original images that have an AVIF counterpart."
 echo "The next step will PERMANENTLY DELETE these original files."

@@ -28,9 +28,9 @@ set -euo pipefail
 
 # 1. Parameters / defaults
 # The root directory to search for images.
-SEARCH_DIR="html/wp-content/uploads"
+SEARCH_DIR="${1:-html/wp-content/uploads}"
 # The maximum dimension (width or height) for the output AVIF images.
-MAX_DIMENSION=1500
+MAX_DIMENSION="${2:-1500}"
 # AVIF Encoding Settings for MAXIMUM compression.
 # -q 75: High quality setting (0-100).
 # --speed 0: The slowest setting, performs exhaustive analysis for the smallest file size.
