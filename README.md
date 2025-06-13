@@ -118,4 +118,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 👋🏼 You need help ?
 
-We can help you with your software projects. [Contact Us !](mailto:[contact@compozit.fr])
+We can help you with your software projects. [Contact Us !](mailto:contact@compozit.fr)
